@@ -1,11 +1,12 @@
-package org.example;
-
-import java.sql.*;
-
 /**
- * A simple program that demonstrates basic CRUD (Create, Read, Update, Delete) operations
- * using JDBC to interact with a MySQL database.
+
+ A simple program that demonstrates basic CRUD (Create, Read, Update, Delete) operations
+ using JDBC to interact with a MySQL database.
  */
+package org.example;
+import java.sql.*;
+import java.util.ArrayList;
+
 public class Main {
     /**
      * The main method that runs the program.
@@ -14,11 +15,11 @@ public class Main {
      */
     public static void main(String[] args) {
         try {
-            // Establish a connection to the database using JDBC
+// Establish a connection to the database using JDBC
             Connection connection = null;
             try {
                 connection = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/tradb",  // JDBC URL for the database
+                        "jdbc:mysql://localhost:3306/tradb", // JDBC URL for the database
                         System.getenv("USERNAME"),
                         System.getenv("PASSWORD")
                 );
@@ -29,38 +30,29 @@ public class Main {
             // Create a statement object to execute SQL statements
             Statement statement = connection.createStatement();
 
-            // Read (select) data from the database
+            // Execute the SQL query to read data from the student table
             statement.execute("SELECT * FROM student;");
             ResultSet rs = statement.getResultSet();
 
-            // Print out the results of the query
+            // Create an ArrayList to store the student objects
+            ArrayList<Student> studentList = new ArrayList();
+
+            // Loop through the result set and create a new student object for each row of data
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
                 String email = rs.getString("email");
+                int age = rs.getInt("age");
 
-                System.out.println("ID: " + id + ", Name: " + name + ", Email: " + email);
+                // Create a new student object and add it to the ArrayList
+                Student newStudent = new Student(id, name, email, age);
+                studentList.add(newStudent);
             }
 
-            // Update data in the database
-            int idToUpdate = 2;
-            String newEmail = "wasan@gmail.com";
-
-            statement.executeUpdate("UPDATE student SET email = '" + newEmail + "' WHERE id = " + idToUpdate);
-            System.out.println("Student updated");
-
-            // Insert data into the database
-            String newName = "Salim";
-            String newEmail2 = "salim@gmail.com";
-
-            statement.executeUpdate("INSERT INTO student (name, email) VALUES ('" + newName + "', '" + newEmail2 + "')");
-            System.out.println("New student inserted");
-
-            // Delete data from the database
-            int idToDelete = 4;
-
-            statement.executeUpdate("DELETE FROM student WHERE id = " + idToDelete);
-            System.out.println("Student deleted");
+            // Print out the student list
+            for(Student currentStudent : studentList)
+                System.out.println("ID: " + currentStudent.getId() + ", Name: " + currentStudent.getName()
+                        + ", Email: " + currentStudent.getEmail() + " ,Age: " + currentStudent.getAge());
 
             // Close the resources (result set, statement, and connection)
             rs.close();
@@ -71,4 +63,5 @@ public class Main {
             throw new RuntimeException(e);
         }
     }
+
 }
